@@ -52,13 +52,7 @@ public class Main extends Application {  //Application contains all the core fun
 
 
 
-        /*This class will handle button event*/
-        /* button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
 
-            }
-        });*/
         button1.setOnAction(e -> primaryStage.setScene(scene2));  //prints hi! on console  //will perfrom this action as many time as you press
 
 
