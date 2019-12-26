@@ -4,28 +4,22 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.effect.DropShadow;
+
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
-import javafx.scene.input.MouseButton;
+
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
-
-
+//needed for the image in the first_scene
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import javafx.scene.control.Button;
-
-
 import java.io.IOException;
-
+import javafx.scene.control.Button;
 
 public class Main extends Application {
 
@@ -33,123 +27,99 @@ public class Main extends Application {
         launch(args);
     }
 
-    Pane pane = new Pane();
+    Pane game_layout = new Pane();
     int[][] board  = new int[7][6];
-    int player = 1;
+    int player = 1;  //player=1 is red and player=2 is yellow
 
-    //insert
-    public void update(){
+    public void CircleChange(){
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 6; j++) {
-                Circle circle = new Circle((i * 100) + 50, (j * 100) + 50, 50, javafx.scene.paint.Color.WHITE);
+                Circle circle = new Circle((i * 100) + 50, (j * 100) + 50, 50, Color.WHITE);
                 if(board[i][j] == 1 || board[i][j] == 2){
                     if (board[i][j] == 1){
-                        circle.setFill(javafx.scene.paint.Color.RED);
+                        circle.setFill(Color.RED);
                         InnerShadow is = new InnerShadow();
                         is.setOffsetX(2.0f);
                         is.setOffsetY(2.0f);
                         circle.setEffect(is);
                     }
                     if (board[i][j] == 2){
-                        circle.setFill(javafx.scene.paint.Color.YELLOW);
+                        circle.setFill(Color.YELLOW);
                         InnerShadow is = new InnerShadow();
                         is.setOffsetX(2.0f);
                         is.setOffsetY(2.0f);
                         circle.setEffect(is);
                     }
                 }
-                pane.getChildren().add(circle);
+                game_layout.getChildren().add(circle);
             }
         }
     }
 
-    public void updateWinner(int y1, int x1, int y2, int x2, int y3, int x3, int y4, int x4){
-
-        Circle circle1 = new Circle((x1 * 100) + 50, (y1 * 100) + 50, 50, javafx.scene.paint.Color.WHITE);
-          /*  FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.1), circle1);
-            fadeTransition.setFromValue(1.0);
-            fadeTransition.setToValue(0.0);
-            fadeTransition.setCycleCount(Animation.INDEFINITE);
-            fadeTransition.play();*/
-        Circle circle2 = new Circle((x2 * 100) + 50, (y2 * 100) + 50, 50, javafx.scene.paint.Color.WHITE);
-            /*FadeTransition fadeTransition2 = new FadeTransition(Duration.seconds(0.1), circle2);
-            fadeTransition2.setFromValue(1.0);
-            fadeTransition2.setToValue(0.0);
-            fadeTransition2.setCycleCount(Animation.INDEFINITE);
-            fadeTransition2.play();*/
-        Circle circle3 = new Circle((x3 * 100) + 50, (y3 * 100) + 50, 50, javafx.scene.paint.Color.WHITE);
-          /*  FadeTransition fadeTransition3 = new FadeTransition(Duration.seconds(0.1), circle3);
-            fadeTransition3.setFromValue(1.0);
-            fadeTransition3.setToValue(0.0);
-            fadeTransition3.setCycleCount(Animation.INDEFINITE);
-            fadeTransition3.play();*/
-        Circle circle4 = new Circle((x4 * 100) + 50, (y4 * 100) + 50, 50, javafx.scene.paint.Color.WHITE);
-          /*  FadeTransition fadeTransition4 = new FadeTransition(Duration.seconds(0.1), circle4);
-            fadeTransition4.setFromValue(1.0);
-            fadeTransition4.setToValue(0.0);
-            fadeTransition4.setCycleCount(Animation.INDEFINITE);
-            fadeTransition4.play();*/
-        pane.getChildren().addAll(circle1, circle2, circle3, circle4);
-    }
-
-    public int bottom(int x){
-        //finds next available spot on x axis
-        //finds the empty place in the column
+    public int EmptyRow(int x){
+        //finds the empty place in the column from the x.
         for (int y = 5; y >= 0; y-- )
             if (board[x][y] == 0) return y;
         return -1;
     }
 
-    public int looper(int y, int x){
-        //loops back the positions that are off the board on either side of last clicked.
+    public int BoardIndexValue(int y, int x){  //returns whether at that index there is 1 , 2 or 0
         if (y < 0 || x < 0 || y >= 6 || x >= 7)
             return 0;
         return board[x][y];
     }
 
-
-    public int winner(){
-        //row checker
-        for(int x = 0; x < 7; x ++)
-            for (int y = 0; y < 8; y++){
-                if (looper(y, x) != 0 &&
-                        looper(y,x) == looper(y,x+1)&&
-                        looper(y,x) == looper(y,x+2)&&
-                        looper(y,x) == looper(y,x+3)){
-                    //updateWinner(y,x+1, y,x+2, y,x+3, y, x);
-                    return looper(y,x);
-                }}
-        //column checker
-        for(int x = 0; x < 7; x ++)
+    public int Winner() {
+        //this loop will check if there is a match in the row
+        for (int x = 0; x < 7; x++) {
             for (int y = 0; y < 8; y++) {
-                if (looper(y, x) != 0 &&
-                        looper(y, x) == looper(y + 1, x) &&
-                        looper(y, x) == looper(y + 2, x) &&
-                        looper(y, x) == looper(y + 3, x)) {
-                    //  updateWinner(y + 1, x, y + 3, x, y + 2, x, y, x);
-                    return looper(y, x);
+                if (BoardIndexValue(y, x) != 0 &&
+                        BoardIndexValue(y, x) == BoardIndexValue(y, x + 1) &&
+                        BoardIndexValue(y, x) == BoardIndexValue(y, x + 2) &&
+                        BoardIndexValue(y, x) ==BoardIndexValue(y, x + 3)) {
+                    return BoardIndexValue(y, x);
                 }
             }
-        //diagonal checker
-        for(int x = 0; x < 7; x ++)
-            for (int y = 0; y < 8; y++)
-                for (int d = -1; d <= 1; d +=2){
-                    if (looper(y, x) != 0 &&
-                            looper(y, x) == looper(y + 1 * d, x + 1) &&
-                            looper(y, x) == looper(y + 2 * d, x + 2) &&
-                            looper(y, x) == looper(y + 3 * d, x + 3)) {
-                        // updateWinner( y + 1 * d, x + 1 , y + 2 * d, x + 2, y + 3 * d, x + 3, y, x);
-                        return looper(y, x);
+        }
+
+
+        //this loop will check if there is a match in the column
+        for (int x = 0; x < 7; x++){
+            for (int y = 0; y < 8; y++) {
+                if (BoardIndexValue(y, x) != 0 &&
+                        BoardIndexValue(y, x) == BoardIndexValue(y + 1, x) &&
+                        BoardIndexValue(y, x) == BoardIndexValue(y + 2, x) &&
+                        BoardIndexValue(y, x) == BoardIndexValue(y + 3, x)) {
+
+                    return BoardIndexValue(y, x);
+                }
+            }
+        }
+
+        //this loop will check if there is a match in the diagonal
+        for(int x = 0; x < 7; x ++) {
+            for (int y = 0; y < 8; y++) {
+                for (int d = -1; d <= 1; d += 2) {
+                    if (BoardIndexValue(y, x) != 0 &&
+                            BoardIndexValue(y, x) == BoardIndexValue(y + 1 * d, x + 1) &&
+                            BoardIndexValue(y, x) == BoardIndexValue(y + 2 * d, x + 2) &&
+                            BoardIndexValue(y, x) ==BoardIndexValue(y + 3 * d, x + 3)) {
+                        return BoardIndexValue(y, x);
                     }
                 }
-        for (int x = 0; x <7; x++)
-            for (int y = 0;y < 6;y++)
-                if (looper(y,x) == 0)
+            }
+        }
+
+
+        for (int x = 0; x <7; x++) {  //As there is still empty disc the game will continue
+            for (int y = 0; y < 6; y++) {
+                if (BoardIndexValue(y, x) == 0)
                     return 0;
-        //tie checker
+            }
+        }
+        //Since there is no empty disc yet ther is no winner then the game is draw
         return 3;
     }
-
 
     @Override
     public void start(Stage primaryStage){
@@ -162,70 +132,71 @@ public class Main extends Application {
         lighting.setSurfaceScale(5.0);
         rectangle.setEffect(lighting);
         rectangle.setFill(Color.BLUE);
-        pane.getChildren().add(rectangle);
+        game_layout.getChildren().add(rectangle);
 
-        update();
+        CircleChange();//all the white circles are now added to the layout
 
-        pane.setOnMouseClicked(e ->{
-            // if (e.getButton() == MouseButton.PRIMARY) {
+        game_layout.setOnMouseClicked(e ->{
+
             int x = (int) (e.getX() / 100);
-            int y = bottom(x);
+            int y =EmptyRow(x);
             if(y >= 0){
                 board[x][y] = player;
                 if (player == 1) player = 2;
                 else player = 1;
-                // }
 
-                update();
-                if (winner() != 0 ) {
-                    if (winner() == 3){
-                        Parent root = null;
-                        try {
-                            root = FXMLLoader.load(getClass().getResource("DRAW.fxml"));
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        Scene s=new Scene(root);
-                        primaryStage.setScene(s);
+                CircleChange();
 
-                    }else{
-                        if(winner()==1){
-                            Parent root = null;
-                            try {
-                                root = FXMLLoader.load(getClass().getResource("RED.fxml"));
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            Scene s=new Scene(root);
-                            primaryStage.setScene(s);
-                        }
-                        if(winner()==2){
-                            Parent root = null;
-                            try {
-                                root = FXMLLoader.load(getClass().getResource("yellow.fxml"));
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            Scene s=new Scene(root);
-                            primaryStage.setScene(s);
-                        }
+
+                if(Winner()==1){
+                    Parent red = null;
+                    try {
+                        red = FXMLLoader.load(getClass().getResource("RED.fxml"));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
+                    Scene s=new Scene(red);
+                    primaryStage.setScene(s); //goes to red scene
+                }
+                if(Winner()==2){
+                    Parent yellow = null;
+                    try {
+                        yellow = FXMLLoader.load(getClass().getResource("yellow.fxml"));
+
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    Scene s=new Scene(yellow);
+                    primaryStage.setScene(s); //goes to yellow scene
+                }
+                if (Winner() == 3){
+                    Parent draw = null;
+                    try {
+                        draw = FXMLLoader.load(getClass().getResource("DrawFinal.fxml"));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    Scene s=new Scene(draw);
+                    primaryStage.setScene(s); //goes to draw scene
 
                 }
+
+
             }
         });
-
+        //Creating the entrance Scene
         Image img= new Image("6h2b338yzfo11.jpg");
         Pane first_layout= new Pane();
         Button play=new Button("PLAY");
         Button exit=new Button("EXIT");
+
         play.setOnAction(v ->{
-            Scene scene = new Scene(pane);
-            primaryStage.setScene(scene);
+            Scene scene = new Scene(game_layout);
+            primaryStage.setScene(scene); //this will transition to the board scene
         });
-        exit.setOnAction(v ->{
-            System.exit(0);
-        });
+
+        exit.setOnAction(v -> System.exit(0));
+
         play.setLayoutX(143);
         play.setLayoutY(315);
         play.setPrefSize(100,50);
@@ -244,7 +215,6 @@ public class Main extends Application {
 
         Scene first_scene = new Scene(first_layout,700,600);
         primaryStage.setScene(first_scene);
-        primaryStage.show();
+        primaryStage.show();//aplication will start from first scene
     }
-
 }

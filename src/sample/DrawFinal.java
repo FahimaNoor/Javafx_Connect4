@@ -1,9 +1,8 @@
 package sample;
 
-public class DRAW {
+public class DrawFinal {
 
     public void exit(){
         System.exit(0);
     }
-
 }
